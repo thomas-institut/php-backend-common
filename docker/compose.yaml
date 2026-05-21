@@ -1,0 +1,13 @@
+name: backend-common
+
+services:
+  shared-php:
+    container_name: backend-common-php
+    build: .
+    volumes:
+      - ../:/app
+
+  valkey:
+    container_name: backend-common-valkey
+    image: valkey/valkey:8.1-alpine
+    command: valkey-server --save 60 1 --loglevel warning

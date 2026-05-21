@@ -1,0 +1,12 @@
+<?php
+
+namespace ThomasInstitut\JobQueue;
+
+use APM\System\SystemManager;
+
+interface JobHandlerInterface
+{
+    public function run(array $payload, string $jobName) : bool;
+    public function mustBeUnique() : bool;
+    public function minTimeBetweenSchedules() : int;
+}
