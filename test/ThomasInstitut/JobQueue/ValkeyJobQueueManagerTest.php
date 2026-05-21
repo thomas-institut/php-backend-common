@@ -19,13 +19,17 @@ class ValkeyJobQueueManagerTest extends TestCase
     protected function setUp(): void
     {
         // Try to get valkey host from config or environment
-        $host = 'valkey';
+        $host = 'localhost';
         if (getenv('VALKEY_HOST')) {
             $host = getenv('VALKEY_HOST');
         }
+        $port = 6333;
+        if (getenv('VALKEY_PORT')) {
+            $port = intval(getenv('VALKEY_PORT'));
+        }
 
         $this->prefix = 'TestQueue:' . rand(1000, 9999) . ':';
-        $this->valkey = new Client(['host' => $host, 'port' => 6379]);
+        $this->valkey = new Client(['host' => $host, 'port' => $port]);
         
         try {
             $this->valkey->connect();
