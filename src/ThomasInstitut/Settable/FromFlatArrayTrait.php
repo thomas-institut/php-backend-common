@@ -10,6 +10,9 @@ use ReflectionProperty;
 use ReflectionType;
 use ReflectionUnionType;
 
+/**
+ * @deprecated use cuy/valinor instead
+ */
 trait FromFlatArrayTrait
 {
 
