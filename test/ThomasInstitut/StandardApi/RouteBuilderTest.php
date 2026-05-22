@@ -6,7 +6,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Slim\Factory\AppFactory;
 use Slim\Interfaces\RouteCollectorInterface;
-use Slim\Interfaces\RouteInterface;
+use ThomasInstitut\RouteBuilder\RouteBuilder;
 
 class DummyController
 {

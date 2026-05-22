@@ -13,9 +13,6 @@ use ReflectionUnionType;
 trait FromFlatArrayTrait
 {
 
-    /**
-     * @inheritDoc
-     */
     public function fromArray(array $config): void {
         $reflection = new ReflectionClass($this);
         $publicProperties = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);

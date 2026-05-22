@@ -2,6 +2,10 @@
 
 namespace ThomasInstitut\Settable;
 
+
+/**
+ * @deprecated use cuy/valinor instead
+ */
 interface SettableFromArray
 {
 

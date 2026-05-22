@@ -1,6 +1,6 @@
 <?php
 
-namespace ThomasInstitut\StandardApi;
+namespace ThomasInstitut\ApiResponseFactory;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerAwareInterface;
@@ -9,6 +9,9 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use ThomasInstitut\Http\HttpStatus;
 use ThomasInstitut\Profiler\SystemProfiler;
+use ThomasInstitut\StandardApi\ApiResponse;
+use ThomasInstitut\StandardApi\ApiResult;
+use ThomasInstitut\StandardApi\ErrorResponse;
 
 class ApiResponseFactory implements LoggerAwareInterface
 {
@@ -56,7 +59,7 @@ class ApiResponseFactory implements LoggerAwareInterface
 
     public function success(ResponseInterface $response, ApiResponse $apiResponse): ResponseInterface
     {
-        $apiResponse->result = ApiResponse::ResultSuccess;
+        $apiResponse->result = ApiResult::Success;
         $payload = json_encode($apiResponse);
         $this->logSystemProfiler("Response with JSON ready");
         return $this->psrResponseWithRawJson($response, $payload, HttpStatus::SUCCESS);

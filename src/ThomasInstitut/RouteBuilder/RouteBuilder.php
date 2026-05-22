@@ -1,6 +1,7 @@
 <?php
 
-namespace ThomasInstitut\StandardApi;
+
+namespace ThomasInstitut\RouteBuilder;
 
 use InvalidArgumentException;
 use Slim\Interfaces\RouteCollectorInterface;

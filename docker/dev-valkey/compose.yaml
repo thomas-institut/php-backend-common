@@ -1,12 +1,6 @@
 name: backend-common
 
 services:
-  shared-php:
-    container_name: backend-common-php
-    build: .
-    volumes:
-      - ../:/app
-
   valkey:
     container_name: backend-common-valkey
     image: valkey/valkey:8.1-alpine

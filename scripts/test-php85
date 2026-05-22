@@ -1,0 +1,19 @@
+#!/bin/bash
+export PATH=$PATH:/usr/local/bin
+set -e
+
+# Build the image
+docker build -t php-backend-common-php85 -f docker/php85/Dockerfile .
+
+# Setup network and valkey
+NET="test-net-85"
+VALKEY="valkey-85"
+docker network create $NET 2>/dev/null || true
+docker run -d --name $VALKEY --network $NET --network-alias valkey --rm valkey/valkey:8.1-alpine
+
+# Ensure cleanup
+# shellcheck disable=SC2064
+trap "docker stop $VALKEY >/dev/null 2>&1 || true; docker network rm $NET >/dev/null 2>&1 || true" EXIT
+
+# Run the container
+docker run --rm --network $NET php-backend-common-php85

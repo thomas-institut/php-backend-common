@@ -15,7 +15,7 @@ Main areas in `src/ThomasInstitut/`:
 
 ## Tech/runtime expectations
 
-- PHP target: `^8.3` (`composer.json` also pins platform PHP to `8.3`)
+- PHP target: `^8.3` \
 - Test framework: PHPUnit 12
 - Static analysis: PHPStan level 4
 - Key extensions used by the library: `yaml`, `pdo`, `posix`, `pcntl`
@@ -26,10 +26,9 @@ Main areas in `src/ThomasInstitut/`:
 - `src/ThomasInstitut/`: library code, PSR-4 namespace root `ThomasInstitut\`
 - `test/ThomasInstitut/`: PHPUnit tests, generally mirroring source areas
 - `test/.env.local`: env vars for running tests with local PHP against host Valkey
-- `test/.env.container`: env vars for running tests inside container PHP
-- `docker/`: Dockerfile and compose setup for PHP + Valkey
-- `scripts/composer`: run Composer inside the long-running PHP container
-- `scripts/test`: shortcut for running the Composer `test` script in the container
+- `docker/`: Dockerfile and compose setup for development Valkey and other PHP versions
+- `scripts/test-local`: normal way to run tests using local PHP and local Valkey
+- `scripts/test-php8x`: scripts to run tests with specific PHP versions (8.3, 8.4, 8.5)
 
 ## Local development commands
 
@@ -39,10 +38,15 @@ Install dependencies locally:
 composer install
 ```
 
-Run tests locally with host PHP:
+Run tests locally with host PHP (this is the normal and preferred way for Agents):
 
 ```bash
-set -a && source test/.env.local && set +a && composer test
+./scripts/test-local
+```
+
+Note: If running `php` or `composer` locally does not work right away, try adding `/usr/local/bin` to your `PATH`:
+```bash
+export PATH=$PATH:/usr/local/bin
 ```
 
 Run PHPStan locally:
@@ -57,61 +61,19 @@ Run coverage locally:
 set -a && source test/.env.local && set +a && composer test:coverage
 ```
 
-## Container development commands
-
-Start the Docker environment from the repository root:
-
-```bash
-docker compose -f docker/compose.yaml up -d --build
-```
-
-This starts:
-
-- `backend-common-php` (service `shared-php`)
-- `backend-common-valkey` (service `valkey`)
-
-Use the helper script to run Composer inside the PHP container:
-
-```bash
-./scripts/composer install
-./scripts/composer test
-./scripts/composer phpstan
-```
-
-There is also a dedicated test shortcut:
-
-```bash
-./scripts/test
-```
-
-Notes:
-
-- `scripts/composer` uses `docker exec`, so the PHP container must already be running.
-- Inside the container, tests should use the container Valkey host/port (`valkey:6379`). Those values are documented in `test/.env.container`.
-- In practice, the Valkey integration test already defaults to `valkey:6379`, so explicit sourcing is usually only needed when running with local host PHP.
-
 ## Test environment rules
 
-There are **two supported test environments** and they are easy to mix up:
+There are several ways to run the tests, and they are easy to mix up:
 
-1. **Local PHP**
-   - Must load `test/.env.local`
-   - Uses `VALKEY_HOST=localhost` and `VALKEY_PORT=6333`
-   - Recommended command:
+1. **Local PHP (Normal/Preferred)**
+   - Uses local PHP and a local Valkey container.
+   - **Agents must use this way** to ensure tests pass after changes.
+   - Command: `./scripts/test-local`
 
-   ```bash
-   set -a && source test/.env.local && set +a && composer test
-   ```
 
-2. **Container PHP**
-   - Run through `./scripts/composer ...` (or `./scripts/test`)
-   - Uses the Docker network host `valkey` on port `6379`
-   - Typical flow:
-
-   ```bash
-   docker compose -f docker/compose.yaml up -d --build
-   ./scripts/composer test
-   ```
+2. **Version-Specific PHP Containers**
+   - Scripts: `./scripts/test-php83`, `./scripts/test-php84`, `./scripts/test-php85`
+   - **Agents must not normally use these** unless specifically instructed to do so.
 
 The integration-sensitive test is `test/ThomasInstitut/JobQueue/ValkeyJobQueueManagerTest.php`. It reads `VALKEY_HOST` and `VALKEY_PORT`, and skips if Valkey is unavailable.
 
@@ -130,6 +92,7 @@ The integration-sensitive test is `test/ThomasInstitut/JobQueue/ValkeyJobQueueMa
 
 When changing code:
 
+- Ensure that tests pass by running `./scripts/test-local` after any PHP code changes.
 - Add or update PHPUnit coverage alongside behavior changes.
 - For job queue changes, consider both pure unit behavior and Valkey-backed behavior.
 - For API helper changes, keep PSR-7 response semantics stable.

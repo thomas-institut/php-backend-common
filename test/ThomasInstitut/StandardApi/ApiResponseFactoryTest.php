@@ -3,10 +3,11 @@
 namespace ThomasInstitut\StandardApi;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Slim\Psr7\Response;
+use ThomasInstitut\ApiResponseFactory\ApiResponseFactory;
 use ThomasInstitut\Http\HttpStatus;
 use ThomasInstitut\Profiler\SystemProfiler;
-use Psr\Log\LoggerInterface;
 
 class ApiResponseFactoryTest extends TestCase
 {
@@ -60,8 +61,7 @@ class ApiResponseFactoryTest extends TestCase
     public function testSuccess(): void
     {
         $response = new Response();
-        $apiResponse = new ApiResponse();
-        $apiResponse->result = ApiResponse::ResultSuccess;
+        $apiResponse = new SuccessResponse();
 
         $result = $this->factory->success($response, $apiResponse);
 
@@ -70,7 +70,7 @@ class ApiResponseFactoryTest extends TestCase
         
         $body = (string)$result->getBody();
         $data = json_decode($body, true);
-        $this->assertEquals(ApiResponse::ResultSuccess, $data['result']);
+        $this->assertEquals(ApiResult::Success->value, $data['result']);
     }
 
     public function testResponseWithRawJson(): void
@@ -126,7 +126,7 @@ class ApiResponseFactoryTest extends TestCase
         $this->assertEquals(HttpStatus::INTERNAL_SERVER_ERROR, $result->getStatusCode());
         $body = (string)$result->getBody();
         $data = json_decode($body, true);
-        $this->assertEquals(ApiResponse::ResultError, $data['result']);
+        $this->assertEquals(ApiResult::Error->value, $data['result']);
         $this->assertEquals('Internal server error: Something went wrong', $data['message']);
     }
 
