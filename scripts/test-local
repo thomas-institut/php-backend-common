@@ -1,0 +1,15 @@
+#!/bin/bash
+export PATH=$PATH:/usr/local/bin
+set -e
+
+# Make sure the docker container configured in docker/dev-valkey is running
+docker compose -f docker/dev-valkey/compose.yaml up -d
+
+# Load the test environment
+set -a
+# shellcheck disable=SC1091
+source test/.env.local
+set +a
+
+# Run composer test
+composer test
